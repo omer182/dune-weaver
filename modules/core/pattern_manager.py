@@ -496,6 +496,12 @@ def move_polar(theta, rho):
     else:
         y_increment += offset
     
+    # Handle case where machine position is not available (ESP32 not responding)
+    if state.machine_x is None or state.machine_y is None:
+        logger.warning("Machine position is None, initializing to (0, 0)")
+        state.machine_x = 0.0
+        state.machine_y = 0.0
+    
     new_x_abs = state.machine_x + x_increment
     new_y_abs = state.machine_y + y_increment
     

@@ -162,16 +162,41 @@ def connect_device(homing=True):
         state.led_controller = LEDController(state.wled_ip)
         effect_loading(state.led_controller)
         
-    ports = list_serial_ports()
+    # ports = list_serial_ports()
 
-    if state.port and state.port in ports:
-        state.conn = SerialConnection(state.port)
-    elif ports:
-        state.conn = SerialConnection(ports[0])
-    else:
-        logger.warning("No serial ports found. Falling back to WebSocket.")
-        # state.conn = WebSocketConnection('ws://fluidnc.local:81')
-        return
+    # if state.port and state.port in ports:
+    #     state.conn = SerialConnection(state.port)
+    # elif ports:
+    #     state.conn = SerialConnection(ports[0])
+    # else:
+    logger.warning("No serial ports found. Falling back to WebSocket.")
+    # Get ESP32 configuration from environment variables
+    import os
+    esp32_ip = os.environ.get('ESP32_IP', '192.168.0.194')
+    esp32_port = os.environ.get('ESP32_WEBSOCKET_PORT', '81')
+    
+    # Try ESP32 IP address first, then fallback to mDNS
+    ws_urls = [
+        f'ws://{esp32_ip}:{esp32_port}',  # Configurable ESP32 IP
+        'ws://fluidnc.local:81',          # mDNS fallback
+    ]
+    
+    logger.info(f"Using ESP32 IP: {esp32_ip}:{esp32_port} from environment")
+    
+    for ws_url in ws_urls:
+        try:
+            logger.info(f"Attempting WebSocket connection to {ws_url}")
+            state.conn = WebSocketConnection(ws_url)
+            if state.conn.is_connected():
+                logger.info(f"Successfully connected to {ws_url}")
+                break
+        except Exception as e:
+            logger.warning(f"Failed to connect to {ws_url}: {e}")
+            state.conn = None
+    
+    if not state.conn:
+        logger.error("All WebSocket connection attempts failed")
+        # return
     if (state.conn.is_connected() if state.conn else False):
         device_init(homing)
         
