@@ -16,3 +16,6 @@ services:
     environment:
       # ESP32 Configuration - CHANGE THIS FOR YOUR SETUP
       - ESP32_IP=192.168.0.194  # Change to your ESP32's IP address
+      # WLED Configuration - CHANGE THIS FOR YOUR SETUP  
+      - WLED_IP=192.168.0.200    # Change to your WLED device's IP address
+    

@@ -83,6 +83,12 @@ async def cleanup_pattern_manager():
         # Reset machine position
         await connection_manager.update_machine_position()
         
+        if state.led_controller:
+            logger.info("Calling effect_idle for WLED (cleanup)")
+            effect_idle(state.led_controller)
+        else:
+            logger.warning("LED controller is None - cannot call effect_idle (cleanup)")
+        
         logger.info("Pattern manager resources cleaned up")
         
     except Exception as e:
@@ -238,7 +244,10 @@ async def run_theta_rho_file(file_path, is_playlist=False):
         
         start_time = time.time()
         if state.led_controller:
+            logger.info("Calling effect_playing for WLED")
             effect_playing(state.led_controller)
+        else:
+            logger.warning("LED controller is None - WLED effects will not work")
             
         with tqdm(
             total=total_coordinates,
@@ -253,7 +262,10 @@ async def run_theta_rho_file(file_path, is_playlist=False):
                 if state.stop_requested:
                     logger.info("Execution stopped by user")
                     if state.led_controller:
+                        logger.info("Calling effect_idle for WLED (stop)")
                         effect_idle(state.led_controller)
+                    else:
+                        logger.warning("LED controller is None - cannot call effect_idle (stop)")
                     break
                 
                 if state.skip_requested:
@@ -524,6 +536,11 @@ def move_polar(theta, rho):
     state.machine_x = new_x_abs
     state.machine_y = new_y_abs
     
+    # Log if we're using defaults (indicates ESP32 configuration issue)
+    if state.x_steps_per_mm <= 0 or state.y_steps_per_mm <= 0:
+        logger.debug(f"Using default steps_per_mm values - ESP32 may not be configured properly. "
+                      f"x_steps_per_mm: {state.x_steps_per_mm}, y_steps_per_mm: {state.y_steps_per_mm}")
+
 def pause_execution():
     """Pause pattern execution using asyncio Event."""
     logger.info("Pausing pattern execution")

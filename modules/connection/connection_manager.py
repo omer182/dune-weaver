@@ -158,6 +158,15 @@ def device_init(homing=True):
 
 
 def connect_device(homing=True):
+    # Get WLED configuration from environment variables
+    import os
+    wled_ip = os.environ.get('WLED_IP')
+    
+    # Set WLED IP from environment if not already configured
+    if wled_ip and not state.wled_ip:
+        state.wled_ip = wled_ip
+        logger.info(f"Using WLED IP from environment: {wled_ip}")
+    
     if state.wled_ip:
         state.led_controller = LEDController(state.wled_ip)
         effect_loading(state.led_controller)
@@ -171,7 +180,6 @@ def connect_device(homing=True):
     # else:
     logger.warning("No serial ports found. Falling back to WebSocket.")
     # Get ESP32 configuration from environment variables
-    import os
     esp32_ip = os.environ.get('ESP32_IP', '192.168.0.194')
     esp32_port = os.environ.get('ESP32_WEBSOCKET_PORT', '81')
     
