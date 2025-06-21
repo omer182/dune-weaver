@@ -44,9 +44,18 @@ dist/
 
 # Docker files (no need to copy these into the container)
 Dockerfile
-docker-compose.yml
+docker-compose*.yml
 .dockerignore
 
 # Temporary files
 *.tmp
-*.log 
+*.log
+
+# GitHub workflows
+.github/
+
+# Development scripts
+scripts/
+
+# Environment files
+*.env 

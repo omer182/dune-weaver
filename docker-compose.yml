@@ -2,63 +2,17 @@ version: '3.8'
 
 services:
   dune-weaver:
-    # Use pre-built image from GitHub Container Registry
     image: ghcr.io/omer182/dune-weaver:latest
-    
-    # Uncomment below to build locally instead of using pre-built image
-    # build: 
-    #   context: .
-    #   dockerfile: Dockerfile
-    #   platforms:
-    #     - linux/arm64
-    #     - linux/amd64
-    
     container_name: dune-weaver-app
     restart: unless-stopped
     
-    # Use host networking for ESP32 connectivity
-    # This is required for WebSocket communication with ESP32
-    network_mode: host
+    # Port mapping to avoid conflicts with other apps
+    ports:
+      - "8383:8080"  # Access via http://your-rpi-ip:8383
     
-    # Environment variables with defaults - override these in Portainer
+    # Platform specification for Raspberry Pi 5
+    platform: linux/arm64
+    
     environment:
-      # ESP32 Configuration - CHANGE THESE FOR YOUR SETUP
+      # ESP32 Configuration - CHANGE THIS FOR YOUR SETUP
       - ESP32_IP=192.168.0.194  # Change to your ESP32's IP address
-      - ESP32_WEBSOCKET_PORT=81
-      - ESP32_HTTP_PORT=80
-      
-      # Web Application Settings
-      - WEB_PORT=8080
-      - HOST=0.0.0.0
-      - DEBUG=false
-      - PYTHONPATH=/app
-      
-      # Optional Serial Connection (uncomment if needed)
-      # - SERIAL_PORT=/dev/ttyUSB0
-      # - SERIAL_BAUD=115200
-    
-    # Volume mappings for persistent custom patterns
-    volumes:
-      - ./patterns/custom_patterns:/app/patterns/custom_patterns
-    
-    # mDNS hostname resolution for ESP32
-    extra_hosts:
-      - "fluidnc.local:192.168.0.194"  # Change to match your ESP32_IP
-      - "esp32.local:192.168.0.194"    # Change to match your ESP32_IP
-    
-    # Resource limits optimized for Raspberry Pi 5
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-          cpus: '1.0'
-        reservations:
-          memory: 256M
-          cpus: '0.5'
-    
-    # Logging configuration
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"

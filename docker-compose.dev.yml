@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  dune-weaver:
+    # Build locally for development
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      # Platform auto-detected based on host architecture
+    image: dune-weaver:local
+    container_name: dune-weaver-dev
+    restart: unless-stopped
+    
+    # Use host networking for ESP32 connectivity
+    network_mode: host
+    
+    # Environment variables for development
+    environment:
+      # ESP32 Configuration - CHANGE THESE FOR YOUR SETUP
+      - ESP32_IP=192.168.0.194  # Change to your ESP32's IP address
+      - ESP32_WEBSOCKET_PORT=81
+      - ESP32_HTTP_PORT=80
+      
+      # Web Application Settings
+      - WEB_PORT=8080
+      - HOST=0.0.0.0
+      - DEBUG=true  # Enable debug mode for development
+      - PYTHONPATH=/app
+      
+      # Optional Serial Connection (uncomment if needed)
+      # - SERIAL_PORT=/dev/ttyUSB0
+      # - SERIAL_BAUD=115200
+    
+    # Volume mappings for development (mount source code)
+    volumes:
+      - ./patterns/custom_patterns:/app/patterns/custom_patterns
+      # Uncomment below for live code editing during development
+      # - .:/app
+    
+    # mDNS hostname resolution for ESP32
+    extra_hosts:
+      - "fluidnc.local:192.168.0.194"  # Change to match your ESP32_IP
+      - "esp32.local:192.168.0.194"    # Change to match your ESP32_IP 
