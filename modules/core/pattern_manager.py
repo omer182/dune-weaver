@@ -491,11 +491,6 @@ def move_polar(theta, rho):
     y_steps_per_mm = state.y_steps_per_mm if state.y_steps_per_mm > 0 else 80.0  # Default for typical stepper
     gear_ratio = state.gear_ratio if state.gear_ratio > 0 else 10.0  # Default gear ratio
     
-    # Log if we're using defaults (indicates ESP32 configuration issue)
-    if state.x_steps_per_mm <= 0 or state.y_steps_per_mm <= 0:
-        logger.warning(f"Using default steps_per_mm values - ESP32 may not be configured properly. "
-                      f"x_steps_per_mm: {state.x_steps_per_mm}, y_steps_per_mm: {state.y_steps_per_mm}")
-    
     x_total_steps = x_steps_per_mm * (100/x_scaling_factor)
     y_total_steps = y_steps_per_mm * (100/y_scaling_factor)
     
