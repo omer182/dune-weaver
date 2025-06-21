@@ -2,14 +2,17 @@ version: '3.8'
 
 services:
   dune-weaver:
-    build: 
-      context: .
-      dockerfile: Dockerfile
-      # Specify platform for Raspberry Pi 5 (ARM64)
-      platforms:
-        - linux/arm64
-        - linux/amd64
-    image: dune-weaver:local
+    # Use pre-built image from GitHub Container Registry
+    image: ghcr.io/omer182/dune-weaver:latest
+    
+    # Uncomment below to build locally instead of using pre-built image
+    # build: 
+    #   context: .
+    #   dockerfile: Dockerfile
+    #   platforms:
+    #     - linux/arm64
+    #     - linux/amd64
+    
     container_name: dune-weaver-app
     restart: unless-stopped
     
@@ -40,8 +43,8 @@ services:
     
     # mDNS hostname resolution for ESP32
     extra_hosts:
-      - "fluidnc.local:192.168.1.100"  # Change to match your ESP32_IP
-      - "esp32.local:192.168.1.100"    # Change to match your ESP32_IP
+      - "fluidnc.local:192.168.0.194"  # Change to match your ESP32_IP
+      - "esp32.local:192.168.0.194"    # Change to match your ESP32_IP
     
     # Resource limits optimized for Raspberry Pi 5
     deploy:

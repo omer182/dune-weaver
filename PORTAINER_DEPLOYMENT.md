@@ -58,13 +58,8 @@ docker buildx inspect --bootstrap
 
    services:
      dune-weaver:
-       build:
-         context: .
-         dockerfile: Dockerfile
-         platforms:
-           - linux/arm64  # Raspberry Pi 5
-           - linux/amd64  # Intel/AMD
-       image: dune-weaver:local
+       # Use pre-built multi-arch image (faster deployment)
+       image: ghcr.io/omer182/dune-weaver:latest
        container_name: dune-weaver-app
        restart: unless-stopped
        
@@ -100,15 +95,17 @@ docker buildx inspect --bootstrap
              cpus: '0.5'
    ```
 
-5. **Configure Environment Variables**
-   In the **Environment variables** section, add:
+5. **Configure Your ESP32 IP**
+   Before deploying, edit the `docker-compose.yml` file and change:
+   ```yaml
+   - ESP32_IP=192.168.1.100  # Change to YOUR ESP32's IP address
+   ```
+   
+   Alternatively, you can override in Portainer's **Environment variables** section:
    
    | Name | Value | Description |
    |------|-------|-------------|
-   | `ESP32_IP` | `192.168.0.194` | Your ESP32's IP address |
-   | `ESP32_WEBSOCKET_PORT` | `81` | WebSocket port (usually 81) |
-   | `ESP32_HTTP_PORT` | `80` | HTTP port (usually 80) |
-   | `HOST_PORT` | `8080` | Port to access web interface |
+   | `ESP32_IP` | `192.168.1.XXX` | Your ESP32's IP address |
 
 6. **Deploy Stack**
    - Click **Deploy the stack**
